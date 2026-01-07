@@ -47,7 +47,7 @@ class OpenAIClient:
         import httpx
 
         # Create httpx client without proxy to avoid compatibility issues
-        http_client = httpx.Client(limit=100, timeout=60.0)
+        http_client = httpx.Client(timeout=60.0)
 
         self.client = OpenAI(
             api_key=api_key,
