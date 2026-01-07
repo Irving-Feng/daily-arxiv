@@ -44,7 +44,16 @@ class OpenAIClient:
             max_tokens: Maximum tokens in response
             temperature: Response temperature (0-1)
         """
-        self.client = OpenAI(api_key=api_key, base_url=base_url)
+        import httpx
+
+        # Create httpx client without proxy to avoid compatibility issues
+        http_client = httpx.Client(limit=100, timeout=60.0)
+
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url=base_url,
+            http_client=http_client
+        )
         self.model = model
         self.max_tokens = max_tokens
         self.temperature = temperature
