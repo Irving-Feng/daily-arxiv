@@ -1,0 +1,46 @@
+name: Monthly arXiv Summary
+
+on:
+  schedule:
+    # Last day of month at 8:00 AM Beijing time
+    - cron: '0 0 28-31 * *'  # Runs on 28-31, will check if last day in Python
+  workflow_dispatch:
+
+jobs:
+  monthly-summary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run monthly summary
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
+          ARXIV_CATEGORY: cs.CL
+          USER_INTERESTS: agents,agentic memory,reinforcement learning,reasoning
+          TIMEZONE: Asia/Shanghai
+        run: python main.py --mode monthly
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-monthly-${{ github.run_number }}
+          path: logs/
