@@ -9,6 +9,7 @@ from loguru import logger
 def create_rich_text(content: str, bold: bool = False, link: str | None = None) -> List[Dict[str, Any]]:
     """
     Create a rich text object for Notion.
+    Automatically splits content if it exceeds 2000 characters (Notion API limit).
 
     Args:
         content: Text content
@@ -18,20 +19,75 @@ def create_rich_text(content: str, bold: bool = False, link: str | None = None) 
     Returns:
         List of rich text objects
     """
-    rich_text = {
-        "type": "text",
-        "text": {
-            "content": content
+    NOTION_TEXT_LIMIT = 2000
+
+    # If content is within limit, return single rich text object
+    if len(content) <= NOTION_TEXT_LIMIT:
+        rich_text = {
+            "type": "text",
+            "text": {
+                "content": content
+            }
         }
-    }
 
-    if link:
-        rich_text["text"]["link"] = {"url": link}
+        if link:
+            rich_text["text"]["link"] = {"url": link}
 
-    if bold:
-        rich_text["annotations"] = {"bold": True}
+        if bold:
+            rich_text["annotations"] = {"bold": True}
 
-    return [rich_text]
+        return [rich_text]
+
+    # Split content into chunks that respect the limit
+    # Try to split at sentence boundaries to maintain readability
+    chunks = []
+    current_chunk = ""
+
+    # Split by sentences (looking for periods, question marks, exclamation marks)
+    import re
+    sentences = re.split(r'([。！？.!?])', content)
+
+    # Re-join with punctuation
+    i = 0
+    while i < len(sentences):
+        if i + 1 < len(sentences) and sentences[i + 1] in '。！？.!?':
+            sentence = sentences[i] + sentences[i + 1]
+            i += 2
+        else:
+            sentence = sentences[i]
+            i += 1
+
+        # If adding this sentence would exceed limit, save current chunk
+        if current_chunk and len(current_chunk) + len(sentence) > NOTION_TEXT_LIMIT:
+            chunks.append(current_chunk)
+            current_chunk = sentence
+        else:
+            current_chunk += sentence
+
+    # Add remaining content
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    # Create rich text objects for each chunk
+    rich_texts = []
+    for i, chunk in enumerate(chunks):
+        rich_text = {
+            "type": "text",
+            "text": {
+                "content": chunk
+            }
+        }
+
+        # Only add link to the first chunk if link is provided
+        if link and i == 0:
+            rich_text["text"]["link"] = {"url": link}
+
+        if bold:
+            rich_text["annotations"] = {"bold": True}
+
+        rich_texts.append(rich_text)
+
+    return rich_texts
 
 
 def create_heading_block(text: str, level: int = 1) -> Dict[str, Any]:
