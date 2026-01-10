@@ -253,10 +253,10 @@ Verify that your Notion API credentials are correct and the system can create pa
 
 ```bash
 # Test basic connection
-python test_notion.py
+python tests/test_notion.py
 
 # Test page creation (creates a test page in your Notion database)
-python test_notion.py --create-page
+python tests/test_notion.py --create-page
 ```
 
 **Expected Output:**
@@ -277,10 +277,10 @@ Verify that the scraper can extract and rank papers from papers.cool:
 
 ```bash
 # Test with default date (2026-01-05)
-python test_papers_cool.py
+python tests/test_papers_cool.py
 
 # Test with specific date
-python test_papers_cool.py --date 2026-01-05
+python tests/test_papers_cool.py --date 2026-01-05
 ```
 
 **Expected Output:**
@@ -308,10 +308,10 @@ Verify that the arXiv API client can fetch paper metadata:
 
 ```bash
 # Test with sample paper IDs
-python test_arxiv.py --paper-ids 2501.12345 2501.12346
+python tests/test_arxiv.py --paper-ids 2501.12345 2501.12346
 
 # Test search functionality
-python test_arxiv.py --search
+python tests/test_arxiv.py --search
 ```
 
 **Expected Output:**
@@ -339,14 +339,14 @@ Verify that OpenAI API can generate Chinese translations and reports:
 
 ```bash
 # Test all components (connection, translation, reports)
-python test_llm.py --test all
+python tests/test_llm.py --test all
 
 # Test specific components
-python test_llm.py --test connection    # Test API connection only
-python test_llm.py --test title         # Test title translation
-python test_llm.py --test abstract      # Test abstract translation
-python test_llm.py --test detailed      # Test full detailed report (slower)
-python test_llm.py --test summary       # Test basic summary
+python tests/test_llm.py --test connection    # Test API connection only
+python tests/test_llm.py --test title         # Test title translation
+python tests/test_llm.py --test abstract      # Test abstract translation
+python tests/test_llm.py --test detailed      # Test full detailed report (slower)
+python tests/test_llm.py --test summary       # Test basic summary
 ```
 
 **Expected Output:**
@@ -413,10 +413,10 @@ pip install -r requirements.txt
 cat .env
 
 # 3. Test all APIs
-python test_notion.py                    # ~5 seconds
-python test_papers_cool.py              # ~10 seconds
-python test_arxiv.py --search           # ~15 seconds
-python test_llm.py --test all           # ~2-3 minutes
+python tests/test_notion.py                    # ~5 seconds
+python tests/test_papers_cool.py              # ~10 seconds
+python tests/test_arxiv.py --search           # ~15 seconds
+python tests/test_llm.py --test all           # ~2-3 minutes
 
 # 4. Run full pipeline with small dataset
 python main.py --mode daily --date 2026-01-05   # ~10-20 minutes
@@ -437,28 +437,28 @@ echo "Running all tests..."
 echo "================================"
 
 echo "1. Testing Notion API..."
-python test_notion.py
+python tests/test_notion.py
 if [ $? -ne 0 ]; then
     echo "✗ Notion test failed!"
     exit 1
 fi
 
 echo "2. Testing papers.cool scraper..."
-python test_papers_cool.py
+python tests/test_papers_cool.py
 if [ $? -ne 0 ]; then
     echo "✗ papers.cool test failed!"
     exit 1
 fi
 
 echo "3. Testing arXiv API..."
-python test_arxiv.py --search
+python tests/test_arxiv.py --search
 if [ $? -ne 0 ]; then
     echo "✗ arXiv test failed!"
     exit 1
 fi
 
 echo "4. Testing LLM generation..."
-python test_llm.py --test summary
+python tests/test_llm.py --test summary
 if [ $? -ne 0 ]; then
     echo "✗ LLM test failed!"
     exit 1

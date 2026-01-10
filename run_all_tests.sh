@@ -13,7 +13,7 @@ FAILED_TESTS=0
 # Test 1: Notion API
 echo "1. Testing Notion API Connection..."
 echo "------------------------------------------"
-python test_notion.py
+python tests/test_notion.py
 if [ $? -ne 0 ]; then
     echo "✗ Notion API test FAILED!"
     FAILED_TESTS=$((FAILED_TESTS + 1))
@@ -25,7 +25,7 @@ echo ""
 # Test 2: papers.cool scraper
 echo "2. Testing papers.cool Scraper..."
 echo "------------------------------------------"
-python test_papers_cool.py
+python tests/test_papers_cool.py
 if [ $? -ne 0 ]; then
     echo "✗ papers.cool scraper test FAILED!"
     FAILED_TESTS=$((FAILED_TESTS + 1))
@@ -37,7 +37,7 @@ echo ""
 # Test 3: arXiv API
 echo "3. Testing arXiv API Client..."
 echo "------------------------------------------"
-python test_arxiv.py --search
+python tests/test_arxiv.py --search
 if [ $? -ne 0 ]; then
     echo "✗ arXiv API test FAILED!"
     FAILED_TESTS=$((FAILED_TESTS + 1))
@@ -49,7 +49,7 @@ echo ""
 # Test 4: LLM (OpenAI) - test summary only (faster)
 echo "4. Testing LLM Report Generation..."
 echo "------------------------------------------"
-python test_llm.py --test summary
+python tests/test_llm.py --test summary
 if [ $? -ne 0 ]; then
     echo "✗ LLM test FAILED!"
     FAILED_TESTS=$((FAILED_TESTS + 1))
